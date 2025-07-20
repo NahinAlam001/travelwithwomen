@@ -5,30 +5,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Our Adventure Journal</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Hind+Siliguri:wght@400;700&family=Caveat&display=swap"
-            rel="stylesheet"
-        />
         <style>
             body {
-                background-color: #f3f4f6; /* Lighter gray background */
+                background-color: #d2c8b6; /* A warmer, more vintage background */
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 min-height: 100vh;
-                font-family: "Hind Siliguri", sans-serif;
                 overflow: hidden;
-                padding: 1rem;
+                padding: 2rem;
             }
 
             .book-container {
                 width: 90vw;
-                max-width: 1200px; /* Max width for large screens */
-                height: 85vh; /* Adjusted height */
+                max-width: 1200px;
+                height: 85vh;
                 position: relative;
-                perspective: 1500px;
+                perspective: 2500px; /* Increased perspective for more depth */
             }
 
             .book {
@@ -37,6 +30,11 @@
                 position: relative;
                 transform-style: preserve-3d;
                 transition: transform 0.5s;
+                transform: rotateX(10deg) rotateY(0deg); /* Slight initial tilt */
+            }
+
+            .book:hover {
+                transform: rotateX(0deg) rotateY(0deg);
             }
 
             .page {
@@ -46,7 +44,7 @@
                 top: 0;
                 right: 0;
                 transform-origin: left center;
-                transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1); /* Smoother transition */
+                transition: transform 1.4s cubic-bezier(0.25, 0.1, 0.25, 1);
                 transform-style: preserve-3d;
                 cursor: pointer;
             }
@@ -61,118 +59,70 @@
                 width: 100%;
                 height: 100%;
                 backface-visibility: hidden;
-                background-color: #fffaf0;
-                border: 1px solid #dedede;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); /* Softer shadow */
-                padding: 1.5rem; /* Adjusted padding */
-                overflow-y: auto;
+                box-sizing: border-box;
+                border: 1px solid #a9a9a9;
                 display: flex;
-                flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                gap: 1rem;
-                box-sizing: border-box; /* FIX: Include padding in height/width calculation */
+                background-color: #fdfaf3; /* Creamy page color */
             }
 
             .back {
                 transform: rotateY(180deg);
             }
 
-            .cover .front {
-                background-color: #8b4513;
-                color: white;
-                border: 5px solid #a0522d;
-                text-align: center;
+            /* Cover Styling */
+            .cover .front,
+            .cover .back {
+                background: #4a2c2a; /* Dark leather color */
+                border: 2px solid #3a1c1a;
             }
 
-            .cover .front h1 {
-                font-family: "Playfair Display", serif;
-                font-size: clamp(1.5rem, 5vw, 3rem); /* Responsive font size */
+            .cover .front img,
+            .cover .back img {
+                box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
             }
 
-            .cover .front p {
-                font-family: "Caveat", cursive;
-                font-size: clamp(1rem, 3vw, 1.5rem); /* Responsive font size */
-            }
-
-            .page-content {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-                gap: 1rem;
+            .page img {
                 width: 100%;
-            }
-
-            .page-content img {
-                max-width: 100%; /* Allow image to fill container width */
-                height: auto; /* Maintain aspect ratio */
-                max-height: 45%; /* Limit image height */
+                height: 100%;
                 object-fit: contain;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+                padding: 1rem; /* Padding to prevent image touching edges */
             }
 
-            .page-content p,
-            .page-content h2,
-            .page-content h3 {
-                text-align: justify;
-                padding: 0 1rem;
-                line-height: 1.7; /* Improved line height */
-                color: #333;
-                font-size: clamp(0.8rem, 1.5vw, 1rem); /* Responsive text */
+            .page img.loaded {
+                opacity: 1;
             }
 
-            h2 {
-                font-family: "Playfair Display", serif;
-                font-weight: 700;
-                font-size: clamp(1.2rem, 3vw, 1.5rem); /* Responsive heading */
-                color: #5d4037;
-                text-align: center;
+            /* Page Curvature and Shadow */
+            .page:not(.flipped) .front::before,
+            .page.flipped .back::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: 50px;
+                background: linear-gradient(
+                    to right,
+                    rgba(0, 0, 0, 0.15) 0%,
+                    rgba(0, 0, 0, 0) 100%
+                );
+                pointer-events: none;
             }
 
-            .bengali-text {
-                font-family: "Hind Siliguri", sans-serif;
-            }
-
-            .signature {
-                font-family: "Caveat", cursive;
-                font-size: clamp(
-                    1rem,
-                    2.5vw,
-                    1.5rem
-                ); /* Responsive signature */
-                align-self: flex-end;
-                margin-top: 1rem;
-                color: #a0522d;
-            }
-
-            .collage {
-                display: grid;
-                grid-template-columns: repeat(
-                    auto-fit,
-                    minmax(120px, 1fr)
-                ); /* Responsive grid */
-                gap: 10px;
-                width: 100%;
-                height: 100%;
-                padding: 1rem;
-            }
-
-            .collage img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                border-radius: 5px;
+            .page:not(.flipped) {
+                box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.2);
             }
 
             #prev-btn,
             #next-btn {
-                position: fixed; /* Fixed position for better visibility */
+                position: fixed;
                 top: 50%;
                 transform: translateY(-50%);
-                background-color: rgba(0, 0, 0, 0.6);
+                background-color: rgba(0, 0, 0, 0.5);
                 color: white;
                 border: none;
                 padding: 1rem;
@@ -190,51 +140,38 @@
 
             #prev-btn:hover,
             #next-btn:hover {
-                background-color: rgba(0, 0, 0, 0.8);
+                background-color: rgba(0, 0, 0, 0.7);
             }
 
             #prev-btn {
-                left: 1rem;
+                left: 2rem;
             }
 
             #next-btn {
-                right: 1rem;
+                right: 2rem;
             }
 
-            /* Responsive styles for mobile */
             @media (max-width: 768px) {
                 body {
-                    padding: 0;
-                    align-items: flex-start; /* Align book to top on mobile */
-                    padding-top: 2rem;
+                    padding: 0.5rem;
+                    align-items: center;
                 }
                 .book-container {
                     width: 100vw;
-                    height: 80vh;
+                    height: 75vh;
                 }
                 .page {
                     width: 100%;
                     left: 0;
                 }
-                .book:hover .page:not(.flipped) {
-                    transform: rotateY(0);
-                }
                 .page.flipped {
                     transform: rotateY(-180deg) translateX(-100%);
-                    transform-origin: left center;
-                }
-                .front,
-                .back {
-                    padding: 1rem;
                 }
                 #prev-btn,
                 #next-btn {
-                    bottom: 2rem;
+                    bottom: 1.5rem;
                     top: auto;
                     transform: translateY(0);
-                    padding: 0.8rem;
-                    width: 40px;
-                    height: 40px;
                 }
                 #prev-btn {
                     left: 1rem;
@@ -248,330 +185,115 @@
     <body>
         <div class="book-container">
             <div class="book" id="book">
-                <!-- Page 1: Cover -->
-                <div class="page cover" style="z-index: 8">
+                <!-- Page Element 1 -->
+                <div class="page cover" style="z-index: 7">
                     <div class="front">
-                        <div class="page-content">
-                            <h1>OUR ADVENTURE JOURNAL</h1>
-                            <p>So many stories, so little time...</p>
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039270/1.png"
+                            alt="Page 1 - Cover"
+                        />
                     </div>
                     <div class="back">
-                        <div class="page-content">
-                            <h2 class="bengali-text">নাহিন</h2>
-                            <p class="bengali-text">
-                                আমাদের এই পথচলাটা কত যে স্মৃতিতে ঘেরা! জীবনের
-                                নানা বাঁকে আমরা একসঙ্গে হেসেছি, গল্পে মেতেছি।
-                                তুই আমার কাছে শুধু একজন বন্ধুই নোস, তুই আমার সেই
-                                ভাই যাকে আমি রক্তের সম্পর্কে পাইনি, কিন্তু
-                                আত্মার সম্পর্কে খুঁজে পেয়েছি। আমাদের অফুরন্ত
-                                আড্ডা আর অবিরাম কথোপকথনের মুহূর্তগুলো আমার
-                                স্মৃতির ক্যানভাসে চিরকাল অমলিন থাকবে। রাস্তার
-                                মোড়ের সেই গলির আড্ডা হোক বা বারান্দার কোণে বসে
-                                কাটানো গভীর রাতের সেই মুহূর্তগুলো—সবই আমার
-                                হৃদয়ের গভীরে এক বিশেষ জায়গা করে নিয়েছে। ভবিষ্যতে
-                                হয়তো ভৌগোলিক দূরত্ব আমাদের মাঝে দেয়াল তোলার
-                                চেষ্টা করবে, কিন্তু আমি জানি, আমার সবচেয়ে
-                                দুর্দিনেও ভরসার হাতটা তুই বাড়িয়ে দিবি। ঠিক
-                                তেমনি, কোনো দ্বিধা ছাড়াই জেনে রাখিস, তোর
-                                প্রয়োজনে এই ভাইটাকে তুই সবসময় তোর ছায়া হিসেবে
-                                পাশে পাবি।
-                            </p>
-                            <p class="signature">ইতি, নাহিন</p>
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039277/2.png"
+                            alt="Page 2"
+                        />
                     </div>
                 </div>
 
-                <!-- Page 2 -->
-                <div class="page" style="z-index: 7">
-                    <div class="front">
-                        <div class="page-content">
-                            <h2>আশরাফুল</h2>
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039270/1.png"
-                                alt="Ashraful and friend"
-                                onerror="this.onerror=null;this.src='https://placehold.co/400x300/d3b8ae/333?text=Image+Not+Found';"
-                            />
-                            <p class="bengali-text">
-                                অবশেষে সেই দিনটা চলেই এলো, যখন তুমি আমাদের পেছনে
-                                ফেলে তোমার জীবনের নতুন এক অধ্যায়ের দিকে এগিয়ে
-                                যাচ্ছো। আমি মন থেকে চাই, তুমি জীবনে যা কিছু করার
-                                কথা বলেছো তার সবই যেন তুমি অর্জন করতে পারো। আমার
-                                বিশ্বাস, তুমি পারবে। তুমি আমার কাছে সবসময়
-                                ভাইয়ের মতো ছিলে। কত কত সময় যে আমরা একসাথে
-                                কাটিয়েছি! সত্যি বলতে, এমনও দিন গেছে যখন তুমি
-                                আমাদের সাথে দেখা করতে না আসায় তোমার উপর খুব
-                                অভিমান হতো। কিন্তু সেই অভিমানের চেয়েও বেশি মনে
-                                পড়ে সেই মুহূর্তগুলো, যখন আমরা ঘণ্টার পর ঘণ্টা
-                                একসাথে কাটিয়ে দিতাম। আমি সেই সময়গুলোকে ভীষণভাবে
-                                মিস করি। ভালো থেকো, ভাই।
-                            </p>
-                        </div>
-                    </div>
-                    <div class="back">
-                        <div class="page-content">
-                            <h2>DEAR ASHRAFUL</h2>
-                            <p
-                                style="
-                                    font-size: 1.5rem;
-                                    text-align: center;
-                                    font-style: italic;
-                                "
-                            >
-                                "Though miles may lie between us now, Our
-                                memories will not fade somehow."
-                            </p>
-                            <p class="signature">-Tamim</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 3 -->
+                <!-- Page Element 2 -->
                 <div class="page" style="z-index: 6">
                     <div class="front">
-                        <div class="page-content">
-                            <h2>Shimul</h2>
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039277/2.png"
-                                alt="High five"
-                                onerror="this.onerror=null;this.src='https://placehold.co/400x400/a9a9a9/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039328/3.png"
-                                alt="Fist bump"
-                                style="max-height: 25%"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x200/a9a9a9/333?text=Image+Not+Found';"
-                            />
-                            <p>
-                                kire madarboard! ki vabchis amio sobar moto
-                                likhbo??? jah vaaaaag!!!!! Bidesh jacchis ja,
-                                eto natoker ki ache! But remember, Allah is
-                                enough as an ally; Allah is enough as a helper.
-                            </p>
-                            <p class="signature">Shimul</p>
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039328/3.png"
+                            alt="Page 3"
+                        />
                     </div>
                     <div class="back">
-                        <div class="page-content">
-                            <h2>ASHMAN</h2>
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039357/4.png"
-                                alt="Friends in lab"
-                                onerror="this.onerror=null;this.src='https://placehold.co/400x300/bcaaa4/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039366/5.png"
-                                alt="Friends in corridor"
-                                onerror="this.onerror=null;this.src='https://placehold.co/400x300/bcaaa4/333?text=Image+Not+Found';"
-                            />
-                            <p>
-                                Hey simp lover boy! I hope I don't need to
-                                explain why I chose this nickname. Every circle
-                                has a beginning, and for me it all started with
-                                you. From CSE231, this picture might just be our
-                                first memory together...
-                            </p>
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039357/4.png"
+                            alt="Page 4"
+                        />
                     </div>
                 </div>
 
-                <!-- Page 4 -->
+                <!-- Page Element 3 -->
                 <div class="page" style="z-index: 5">
                     <div class="front">
-                        <div class="page-content">
-                            <h2>ASHMAN (Cont.)</h2>
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039373/6.png"
-                                alt="Fun times"
-                                onerror="this.onerror=null;this.src='https://placehold.co/400x300/c5b8b2/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039379/7.png"
-                                alt="Cafe chat"
-                                onerror="this.onerror=null;this.src='https://placehold.co/400x300/c5b8b2/333?text=Image+Not+Found';"
-                            />
-                            <p>
-                                Maybe this was our last memory when we truly had
-                                fun together... Our 'Travel With Women' journey
-                                was really beautiful, wasn't it? ... Now you're
-                                leaving to chase your dreams. I'm proud, but it
-                                also hits different knowing you'll be far away.
-                                Wishing you the best in this new chapter. Always
-                                cheering for you, brother.
-                            </p>
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039366/5.png"
+                            alt="Page 5"
+                        />
                     </div>
                     <div class="back">
-                        <div class="page-content">
-                            <h2>Women</h2>
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039384/8.png"
-                                alt="Selfie"
-                                onerror="this.onerror=null;this.src='https://placehold.co/400x300/e6dace/333?text=Image+Not+Found';"
-                            />
-                            <p>
-                                I still remember the very first time we met...
-                                It feels like it was just yesterday, yet the
-                                memory carries a timeless warmth... Now you're
-                                going far, stepping into a brand new chapter of
-                                your life. I pray this chapter is even more
-                                beautiful than you've ever dreamed. May Allah
-                                make your path easy and full of blessings.
-                            </p>
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039373/6.png"
+                            alt="Page 6"
+                        />
                     </div>
                 </div>
 
-                <!-- Page 5 -->
+                <!-- Page Element 4 -->
                 <div class="page" style="z-index: 4">
                     <div class="front">
-                        <div class="page-content">
-                            <h2>Dhrubo</h2>
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039391/9.png"
-                                alt="Friends laughing"
-                                onerror="this.onerror=null;this.src='https://placehold.co/400x300/d1c4e9/333?text=Image+Not+Found';"
-                            />
-                            <p>
-                                Our friendship started with some light-hearted
-                                complaints about Nahin... As days went by, we
-                                became closer and shared everything with each
-                                other... You've played a vital role in my life.
-                                You pushed my ego so much, and that helped me
-                                get to where I am today... Love will come and
-                                go, so don't let it cause friction between us.
-                                Our friendship will never fade. I always pray
-                                for your success and happiness.
-                            </p>
-                            <p class="signature">Dhrubo</p>
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039379/7.png"
+                            alt="Page 7"
+                        />
                     </div>
                     <div class="back">
-                        <div class="page-content">
-                            <h2>Topee</h2>
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039397/10.png"
-                                alt="Gazipur Picnic"
-                                onerror="this.onerror=null;this.src='https://placehold.co/400x300/b2dfdb/333?text=Image+Not+Found';"
-                            />
-                            <p>
-                                This photo reminds me of our Gazipur picnic.
-                                This was the one that the entire group spent
-                                quality time together. Unfortunately, this is
-                                the only picture that I have with you... We
-                                can't stop you from leaving, but what we can do
-                                is cherish the memories that you're leaving
-                                behind. Thank you for all of these incredible
-                                memories, and wishing you all the best for your
-                                future.
-                            </p>
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039384/8.png"
+                            alt="Page 8"
+                        />
                     </div>
                 </div>
 
-                <!-- Page 6 -->
+                <!-- Page Element 5 -->
                 <div class="page" style="z-index: 3">
                     <div class="front">
-                        <div class="page-content">
-                            <h2>Hi Mate</h2>
-                            <p
-                                class="bengali-text"
-                                style="font-size: 1.2rem; text-align: center"
-                            >
-                                মুহুর্ত ফুরোলেই অনেক কিছু অতীত হয়ে যায়,
-                                বিষণ্ণতা, হাসি, সবকিছুর অন্ত টানতে হয়। কিন্তু,
-                                মানুষগুলোর একটা অংশ আমাদের মাঝে থাকে, যা দেখে
-                                মনে পরে, আরে আশরাফুল থাকলে এটা বলত, এটা করত। এই
-                                অংশের অনেক শক্তি। আবার, দেখা হবে, মনে পড়লে
-                                যোগাযোগ করতে ভুলো না।
-                            </p>
-                            <p class="signature">আল্লাহ হাফেজ, Ashraful</p>
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039391/9.png"
+                            alt="Page 9"
+                        />
                     </div>
                     <div class="back">
-                        <div class="page-content collage">
-                            <img
-                                src="https://placehold.co/200x200/ffcdd2/333?text=Sticker+1"
-                                alt="Sticker 1"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x200/ffcdd2/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://placehold.co/200x200/c8e6c9/333?text=Sticker+2"
-                                alt="Sticker 2"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x200/c8e6c9/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://placehold.co/200x200/bbdefb/333?text=Sticker+3"
-                                alt="Sticker 3"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x200/bbdefb/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://placehold.co/200x200/fff9c4/333?text=Sticker+4"
-                                alt="Sticker 4"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x200/fff9c4/333?text=Image+Not+Found';"
-                            />
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039397/10.png"
+                            alt="Page 10"
+                        />
                     </div>
                 </div>
 
-                <!-- Page 7: Back Cover -->
+                <!-- Page Element 6 -->
                 <div class="page" style="z-index: 2">
                     <div class="front">
-                        <div class="page-content collage">
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039406/11.png"
-                                alt="Group photo 1"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x150/d7ccc8/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039412/12.png"
-                                alt="Group photo 2"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x150/d7ccc8/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039419/13.png"
-                                alt="Group photo 3"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x150/d7ccc8/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039428/14.png"
-                                alt="Group photo 4"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x150/d7ccc8/333?text=Image+Not+Found';"
-                            />
-                            <img
-                                src="https://placehold.co/200x150/d7ccc8/333?text=Group+5"
-                                alt="Group photo 5"
-                                style="grid-column: span 2"
-                                onerror="this.onerror=null;this.src='https://placehold.co/200x150/d7ccc8/333?text=Image+Not+Found';"
-                            />
-                        </div>
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039406/11.png"
+                            alt="Page 11"
+                        />
                     </div>
-                    <div
-                        class="back"
-                        style="background-color: #8b4513; color: white"
-                    >
-                        <div class="page-content">
-                            <h2 style="color: white">Circle 10</h2>
-                            <p class="bengali-text" style="color: #f1f1f1">
-                                একসাথে শুরু হয়েছিল পথচলা, একসাথে কেটেছে হাজারো
-                                গল্পের দিন... সময়ের টানে হয়তো কেউ মেতে উঠবে
-                                কর্পোরেট জীবনে, কেউ পাড়ি জমাবে দূর বিদেশে নতুন
-                                স্বপ্ন নিয়ে... তবুও, সব কিছু ছাপিয়ে, এই ১০ জনের
-                                বন্ধুত্ব-এই ভালোবাসা-এই 'সার্কেল ১০' থেকে যাবে
-                                সবার মনে একটা মিষ্টি সময়ের নাম হয়ে, একটা প্রিয়
-                                গল্পের অংশ হয়ে, স্মৃতির পাতায় চিরকাল জ্বলজ্বলে
-                                অক্ষরে লেখা থাকবে।
-                            </p>
-                            <p
-                                style="
-                                    font-family: &quot;Caveat&quot;, cursive;
-                                    font-size: 1.2rem;
-                                    margin-top: 1rem;
-                                "
-                            >
-                                We were Circle 10. And we always will be.
-                            </p>
-                        </div>
+                    <div class="back">
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039412/12.png"
+                            alt="Page 12"
+                        />
+                    </div>
+                </div>
+
+                <!-- Page Element 7 -->
+                <div class="page cover" style="z-index: 1">
+                    <div class="front">
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039419/13.png"
+                            alt="Page 13"
+                        />
+                    </div>
+                    <div class="back">
+                        <img
+                            data-src="https://res.cloudinary.com/dqbsdtrfk/image/upload/v1753039428/14.png"
+                            alt="Page 14 - Back Cover"
+                        />
                     </div>
                 </div>
             </div>
@@ -591,41 +313,48 @@
                 const totalPages = pages.length;
                 let autoFlipInterval;
 
-                // Function to flip to a specific page
+                function loadImagesForPage(pageElement) {
+                    if (!pageElement || pageElement.imagesLoaded) return;
+                    const images =
+                        pageElement.querySelectorAll("img[data-src]");
+                    images.forEach((img) => {
+                        img.onload = () => img.classList.add("loaded");
+                        img.src = img.dataset.src;
+                        img.removeAttribute("data-src");
+                    });
+                    pageElement.imagesLoaded = true;
+                }
+
                 function goToPage(pageNum) {
                     currentPage = pageNum;
                     pages.forEach((page, index) => {
-                        // On mobile, we only flip one page at a time
-                        if (window.innerWidth <= 768) {
-                            if (index < pageNum) {
-                                page.classList.add("flipped");
-                                page.style.zIndex = index + 1;
-                            } else {
-                                page.classList.remove("flipped");
-                                page.style.zIndex = totalPages - index;
-                            }
-                        } else {
-                            // Desktop view
-                            if (index < pageNum) {
-                                page.classList.add("flipped");
-                                page.style.zIndex = index + 1;
-                            } else {
-                                page.classList.remove("flipped");
-                                page.style.zIndex = totalPages - index;
-                            }
-                        }
+                        setTimeout(
+                            () => {
+                                if (index < pageNum) {
+                                    page.classList.add("flipped");
+                                    page.style.zIndex = index + 1;
+                                } else {
+                                    page.classList.remove("flipped");
+                                    page.style.zIndex = totalPages - index;
+                                }
+                            },
+                            50 * Math.abs(currentPage - index),
+                        );
                     });
+
+                    loadImagesForPage(pages[currentPage]);
+                    loadImagesForPage(pages[currentPage - 1]);
+                    loadImagesForPage(pages[currentPage + 1]);
+
                     updateButtons();
                 }
 
-                // Update button visibility
                 function updateButtons() {
                     prevBtn.style.display = currentPage === 0 ? "none" : "flex";
                     nextBtn.style.display =
                         currentPage === totalPages ? "none" : "flex";
                 }
 
-                // Event Listeners for buttons
                 prevBtn.addEventListener("click", (e) => {
                     e.stopPropagation();
                     if (currentPage > 0) {
@@ -642,7 +371,6 @@
                     }
                 });
 
-                // Click on page to flip
                 pages.forEach((page, index) => {
                     page.addEventListener("click", () => {
                         const targetPage = page.classList.contains("flipped")
@@ -653,15 +381,14 @@
                     });
                 });
 
-                // Automatic page flipping
                 function startAutoFlip() {
                     autoFlipInterval = setInterval(() => {
                         let nextPage = currentPage + 1;
                         if (nextPage > totalPages) {
-                            nextPage = 0; // Loop back to the cover
+                            nextPage = 0;
                         }
                         goToPage(nextPage);
-                    }, 7000); // Flip every 7 seconds
+                    }, 7000);
                 }
 
                 function stopAutoFlip() {
@@ -673,11 +400,9 @@
                     startAutoFlip();
                 }
 
-                // Initialize
                 goToPage(0);
                 startAutoFlip();
 
-                // Re-evaluate layout on resize
                 window.addEventListener("resize", () => goToPage(currentPage));
             });
         </script>
